@@ -1,5 +1,6 @@
 package szx.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,6 +12,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,14 +24,18 @@ import szx.ShiroUtils;
 import szx.UUIDUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/user")
 public class UserController {
+
+    static String fileName = "";
     @Autowired
     private UserService userService;
 
@@ -111,16 +118,21 @@ public class UserController {
      * */
     @RequestMapping("/add")
     @ResponseBody
-    public JsonResult add(User user) {
-        ShiroUtils.encrypt(user);
-        user.setId(UUIDUtils.getID());
-        user.setSalt(UUIDUtils.getID());
-        user.setCreateTime(new Timestamp(new Date().getTime()));
-        boolean save = userService.save(user);
-        if (save)
-            return new JsonResult(200, "success", null);
-        else
+    public JsonResult add(
+
+                            @RequestParam("user") String user1
+                            ,@RequestParam(value = "img",required = false) MultipartFile file
+    ) {
+        User user = JSONObject.parseObject(user1,User.class);
+
+
+        boolean b = userService.addUser(user, file);
+        if (b) {
+            return new JsonResult(200,"success",null);
+        }
+        else {
             return new JsonResult(400, "failed", null);
+        }
     }
 
     @RequestMapping("/toUpdatePage")
@@ -146,6 +158,8 @@ public class UserController {
     /**
      * 删除（支持批量删除）
      */
+
+
     @ResponseBody
     @RequestMapping("/delete")
     public JsonResult delete(@RequestBody ArrayList<User> users) {

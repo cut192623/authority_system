@@ -63,7 +63,6 @@
 </div>
 
 <table class="layui-hide" id="user" lay-data="{id: 'user'}"></table>
-<%--<script type="text/javascript" src="${ctx}/static/plugins/layui/layui.js"></script>--%>
 <script type="text/javascript" src="${ctx}/static/js/hp_list.js"></script>
 <script>
     layui.use(['table', 'util', 'laypage'], function () {
@@ -86,7 +85,7 @@
             loading: true,
             page: true,
             cols: [[
-                {type: 'checkbox'},
+                {type: 'checkbox',width: 90},
                 {field: 'id', width: 300, title: 'ID', sort: true},
                 {field: 'userName', title: '用户名'},
                 {field: 'nickname', title: '昵称'},

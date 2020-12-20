@@ -25,7 +25,7 @@
 			<div class="layui-logo" style="font-weight: bold; font-size: 20px;">后台管理平台</div>
 			<ul class="layui-nav layui-layout-right">
 				<li class="layui-nav-item"><a href="javascript:;"> <img
-						src="http://t.cn/RCzsdCq" class="layui-nav-img">${user.userName}
+						src="http://localhost:80/${user.userImg}" class="layui-nav-img">${user.userName}
 				</a>
 				</li>
 <%--				todo 走的是shiro默认logout--%>

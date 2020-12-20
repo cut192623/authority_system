@@ -1,42 +1,52 @@
 package szx.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import domain.User;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import service.UserService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/check")
 public class LoginController {
-
+    @Autowired
+    private UserService userService;
     /**
      * 登录跳转页面
      * @param user
-     * @param model
+     * @param request
      * @return
      */
     @PostMapping (value = "login" )
-    public String login(User user, Model model){
+    public String login(User user, HttpServletRequest request, HttpSession session){
         UsernamePasswordToken token = new UsernamePasswordToken(user.getUserName(),user.getPassword());
         Subject subject = SecurityUtils.getSubject();
         try {
             subject.login(token);
-            model.addAttribute("user",subject.getPrincipal());
-            return "redirect:/check/toIndexPage";
+            //session.setAttribute("user",user.getUserName());
+            return "redirect:/check/toIndexPage?name="+user.getUserName();
         }catch (Exception e){
-            model.addAttribute("msg","账户"+token.getUsername()+"的用户名或密码错误");
+            request.setAttribute("msg","账户"+token.getUsername()+"的用户名或密码错误");
             return "forward:/login.jsp";
         }
     }
     @RequestMapping("toIndexPage")
-    public String toIndexPage(){
+    public String toIndexPage(String name,HttpServletRequest request){
+        User user = userService.getOne(new QueryWrapper<User>().eq("user_name", name));
+        request.setAttribute("user",user);
         return "admin/index";
     }
 

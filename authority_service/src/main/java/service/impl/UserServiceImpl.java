@@ -9,10 +9,17 @@ import mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import service.UserRoleService;
 import service.UserService;
+import szx.ShiroUtils;
+import szx.UUIDUtils;
 
+import java.io.File;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -20,6 +27,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private UserRoleService userRoleService;
+    @Autowired
+    private UserService userService;
 
     @Override
     public void setRole(String id, ArrayList<Role> roles) {
@@ -32,5 +41,42 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             userrole.setRoleId(role.getId());
             userRoleService.save(userrole);
         }
+    }
+
+    @Override
+    public boolean addUser(User user, MultipartFile img) {
+
+        user.setId(UUIDUtils.getID());
+        user.setSalt(UUIDUtils.getID());
+        user.setCreateTime(new Timestamp(new Date().getTime()));
+
+        String newFileName = null;
+        if (img!=null){
+             newFileName = UUID.randomUUID() + img.getOriginalFilename();
+            user.setUserImg(newFileName);
+            //对用户密码加密
+            ShiroUtils.encrypt(user);
+            //新增用户
+            boolean save = userService.save(user);
+            File file = new File("D:\\Program Files\\mynginx\\centos\\html");
+            try {
+                img.transferTo(new File(file,newFileName));
+                return save;
+            }catch (Exception e){
+                e.printStackTrace();
+                return save;
+            }
+        }else {
+            user.setUserImg(null);
+            //对用户密码加密
+            ShiroUtils.encrypt(user);
+            //新增用户
+            boolean save = userService.save(user);
+
+            return save;
+        }
+
+
+
     }
 }

@@ -54,9 +54,7 @@ public class MenuController {
         if (id != null && id.length() > 0) {
             //查询所选角色拥有的权限
             List<RoleMenu> roleMenuList = roleMenuService.list(new QueryWrapper<RoleMenu>().eq("role_id", id));
-            roleMenuList.forEach(item -> {
-                ids.add(item.getMenuId());
-            });
+            roleMenuList.forEach(item -> ids.add(item.getMenuId()));
 
             menus.forEach(menu -> {
                         // 先需要把对象转换为JSON格式因为在对某个角色添加权限的时候，该角色可能已经有了一些权限，
