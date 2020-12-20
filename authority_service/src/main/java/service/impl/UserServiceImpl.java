@@ -58,7 +58,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             ShiroUtils.encrypt(user);
             //新增用户
             boolean save = userService.save(user);
-            File file = new File("D:\\Program Files\\mynginx\\centos\\html");
+            File file = new File("/usr/local/nginx/html");
             try {
                 img.transferTo(new File(file,newFileName));
                 return save;
