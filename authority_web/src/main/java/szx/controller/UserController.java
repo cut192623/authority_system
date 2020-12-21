@@ -4,32 +4,30 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 import domain.Role;
 import domain.User;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
-import service.UserService;
+import service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import szx.SFTPUtils;
 import szx.JsonResult.*;
+import szx.OSSUtils;
 import szx.ShiroUtils;
-import szx.UUIDUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/user")
@@ -134,6 +132,47 @@ public class UserController {
             return new JsonResult(400, "failed", null);
         }
     }
+
+    @RequestMapping("/addNginx")
+    @ResponseBody
+    public JsonResult addNginx(
+
+            @RequestParam("user") String user1
+            ,@RequestParam(value = "img",required = false) MultipartFile file
+    ) throws JSchException, SftpException, IOException {
+        //User user = JSONObject.parseObject(user1,User.class);
+
+        SFTPUtils sftpUtils = new SFTPUtils();
+        sftpUtils.whenUploadFileUsingJsch_thenSuccess(file);
+
+
+        return new JsonResult(200,"success",null);
+
+//        boolean b = userService.addUser(user, file);
+//        if (b) {
+//            return new JsonResult(200,"success",null);
+//        }
+//        else {
+//            return new JsonResult(400, "failed", null);
+//        }
+    }
+
+    /**
+     * 新增用户
+     * */
+    @RequestMapping("/ossAdd")
+    @ResponseBody
+    public JsonResult ossAdd(
+
+            @RequestParam("user") String user1
+            ,@RequestParam(value = "img",required = false) MultipartFile file
+    )throws Exception {
+        OSSUtils ossUtils = new OSSUtils();
+        ossUtils.ossUpload(file.getOriginalFilename(),file);
+        return new JsonResult(200,"success",null);
+
+    }
+
 
     @RequestMapping("/toUpdatePage")
     public String toUpdatePage(String id, Model model) {

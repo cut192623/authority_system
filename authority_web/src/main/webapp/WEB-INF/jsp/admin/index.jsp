@@ -25,10 +25,11 @@
 			<div class="layui-logo" style="font-weight: bold; font-size: 20px;">后台管理平台</div>
 			<ul class="layui-nav layui-layout-right">
 				<li class="layui-nav-item"><a href="javascript:;"> <img
-						src="http://192.168.18.130:80/${user.userImg}" class="layui-nav-img">${user.userName}
+<%--						todo 修改图片地址--%>
+						src="http://192.168.18.131:80/${user.userImg}" class="layui-nav-img">${user.userName}
 				</a>
 				</li>
-<%--				todo 走的是shiro默认logout--%>
+
 				<li class="layui-nav-item"><a href="${pageContext.request.contextPath}/logout">注销</a></li>
 			</ul>
 		</div>
