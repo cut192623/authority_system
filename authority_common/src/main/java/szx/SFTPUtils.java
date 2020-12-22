@@ -33,9 +33,7 @@ public class SFTPUtils {
     public void whenUploadFileUsingJsch_thenSuccess(MultipartFile file) throws JSchException, SftpException, IOException {
         ChannelSftp channelSftp = setupJsch();
         channelSftp.connect();
-
         channelSftp.put(file.getInputStream(), path );
-
         channelSftp.exit();
     }
 

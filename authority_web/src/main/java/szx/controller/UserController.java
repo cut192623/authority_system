@@ -200,6 +200,7 @@ public class UserController {
             , @RequestParam(value = "img", required = false) MultipartFile file) {
         String fileName = UUIDUtils.getID() + file.getOriginalFilename();
         User user = JSONObject.parseObject(user1, User.class);
+        User one = userService.getOne(new QueryWrapper<User>().eq("id", user.getId()));
         user.setUserImg(fileName);
         ShiroUtils.encrypt(user);
         user.setUpdateTime(new Timestamp(new Date().getTime()));
@@ -208,6 +209,9 @@ public class UserController {
         if (update) {
             try {
                 OSSUtils ossUtils = new OSSUtils();
+                if (ossUtils.ifExist(one.getUserImg())){
+                    ossUtils.delete(one.getUserImg());
+                }
                 ossUtils.ossUpload(fileName, file);
                 return new JsonResult(200, "success", null);
             } catch (Exception e) {
