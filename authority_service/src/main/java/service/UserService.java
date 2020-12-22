@@ -10,5 +10,5 @@ import java.util.ArrayList;
 public interface UserService extends IService<User> {
 
     void setRole(String id, ArrayList<Role> roles);
-    boolean addUser(User user, MultipartFile img);
+    boolean addUser(User user, MultipartFile img,String fileName);
 }

@@ -6,7 +6,10 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Properties;
 
 public class SFTPUtils {

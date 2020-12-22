@@ -44,40 +44,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public boolean addUser(User user, MultipartFile img) {
+    public boolean addUser(User user, MultipartFile img, String fileName) {
 
         user.setId(UUIDUtils.getID());
         user.setSalt(UUIDUtils.getID());
         user.setCreateTime(new Timestamp(new Date().getTime()));
+        user.setUserImg(fileName);
+        ShiroUtils.encrypt(user);
+        //新增用户
+        boolean save = userService.save(user);
 
-        String newFileName = null;
-        if (img!=null){
-             newFileName = UUID.randomUUID() + img.getOriginalFilename();
-            user.setUserImg(newFileName);
-            //对用户密码加密
-            ShiroUtils.encrypt(user);
-            //新增用户
-            boolean save = userService.save(user);
-           //todo 修改图片存放地址
-            File file = new File("D:\\Program Files\\mynginx\\centos\\html");
-            try {
-                img.transferTo(new File(file,newFileName));
-                return save;
-            }catch (Exception e){
-                e.printStackTrace();
-                return save;
-            }
-        }else {
-            user.setUserImg(null);
-            //对用户密码加密
-            ShiroUtils.encrypt(user);
-            //新增用户
-            boolean save = userService.save(user);
-
-            return save;
-        }
-
-
-
+        return save;
     }
+
+
 }
+

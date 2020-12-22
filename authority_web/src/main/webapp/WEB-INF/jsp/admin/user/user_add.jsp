@@ -97,7 +97,7 @@
 			console.log(formData)
 			$.ajax({
 				type : "post",
-				url : "${ctx}/user/addNginx",
+				url : "${ctx}/user/ossAdd",
 				data : formData,
 				processData : false,
 				contentType : false,

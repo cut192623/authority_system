@@ -21,6 +21,7 @@ import szx.SFTPUtils;
 import szx.JsonResult.*;
 import szx.OSSUtils;
 import szx.ShiroUtils;
+import szx.UUIDUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -38,9 +39,9 @@ public class UserController {
     private UserService userService;
 
 
-
     /**
      * 用户列表跳转
+     *
      * @return
      */
 
@@ -54,6 +55,7 @@ public class UserController {
 
     /**
      * 用户分页
+     *
      * @param page
      * @param limit
      * @param userName
@@ -84,6 +86,7 @@ public class UserController {
 
     /**
      * 用户添加页面跳转
+     *
      * @return
      */
 
@@ -95,6 +98,7 @@ public class UserController {
 
     /**
      * 用户名查重
+     *
      * @param username
      * @return
      */
@@ -113,22 +117,21 @@ public class UserController {
 
     /**
      * 新增用户
-     * */
+     */
     @RequestMapping("/add")
     @ResponseBody
     public JsonResult add(
 
-                            @RequestParam("user") String user1
-                            ,@RequestParam(value = "img",required = false) MultipartFile file
+            @RequestParam("user") String user1
+            , @RequestParam(value = "img", required = false) MultipartFile file
     ) {
-        User user = JSONObject.parseObject(user1,User.class);
+        User user = JSONObject.parseObject(user1, User.class);
 
-
-        boolean b = userService.addUser(user, file);
+        String s = UUIDUtils.getID() + file.getOriginalFilename();
+        boolean b = userService.addUser(user, file, s);
         if (b) {
-            return new JsonResult(200,"success",null);
-        }
-        else {
+            return new JsonResult(200, "success", null);
+        } else {
             return new JsonResult(400, "failed", null);
         }
     }
@@ -138,7 +141,7 @@ public class UserController {
     public JsonResult addNginx(
 
             @RequestParam("user") String user1
-            ,@RequestParam(value = "img",required = false) MultipartFile file
+            , @RequestParam(value = "img", required = false) MultipartFile file
     ) throws JSchException, SftpException, IOException {
         //User user = JSONObject.parseObject(user1,User.class);
 
@@ -146,7 +149,7 @@ public class UserController {
         sftpUtils.whenUploadFileUsingJsch_thenSuccess(file);
 
 
-        return new JsonResult(200,"success",null);
+        return new JsonResult(200, "success", null);
 
 //        boolean b = userService.addUser(user, file);
 //        if (b) {
@@ -159,17 +162,26 @@ public class UserController {
 
     /**
      * 新增用户
-     * */
+     */
     @RequestMapping("/ossAdd")
     @ResponseBody
     public JsonResult ossAdd(
 
             @RequestParam("user") String user1
-            ,@RequestParam(value = "img",required = false) MultipartFile file
-    )throws Exception {
-        OSSUtils ossUtils = new OSSUtils();
-        ossUtils.ossUpload(file.getOriginalFilename(),file);
-        return new JsonResult(200,"success",null);
+            , @RequestParam(value = "img", required = false) MultipartFile file
+    ) throws Exception {
+
+        String fileName = UUIDUtils.getID() + file.getOriginalFilename();
+        User user = JSONObject.parseObject(user1, User.class);
+        boolean b = userService.addUser(user, file, fileName);
+        if (b) {
+            OSSUtils ossUtils = new OSSUtils();
+            ossUtils.ossUpload(fileName, file);
+            return new JsonResult(200, "success", null);
+        } else {
+            return new JsonResult(400, "failed", null);
+        }
+
 
     }
 
@@ -179,6 +191,31 @@ public class UserController {
         User user = userService.getById(id);
         model.addAttribute("user", user);
         return "admin/user/user_update";
+    }
+
+    @RequestMapping("/ossUpdate")
+    @ResponseBody
+    public JsonResult ossUpdate(
+            @RequestParam("user") String user1
+            , @RequestParam(value = "img", required = false) MultipartFile file) {
+        String fileName = UUIDUtils.getID() + file.getOriginalFilename();
+        User user = JSONObject.parseObject(user1, User.class);
+        user.setUserImg(fileName);
+        ShiroUtils.encrypt(user);
+        user.setUpdateTime(new Timestamp(new Date().getTime()));
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        boolean update = userService.update(user, queryWrapper.eq("id", user.getId()));
+        if (update) {
+            try {
+                OSSUtils ossUtils = new OSSUtils();
+                ossUtils.ossUpload(fileName, file);
+                return new JsonResult(200, "success", null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new JsonResult(400, "failed", null);
+            }
+        }
+        return new JsonResult(400, "failed", null);
     }
 
     @RequestMapping("/update")
@@ -225,12 +262,14 @@ public class UserController {
         return "admin/user/user_setRole";
     }
 
-    /** 设置角色 */
+    /**
+     * 设置角色
+     */
     @ResponseBody
     @RequestMapping("setRole")
     public JsonResult setRole(String id, @RequestBody ArrayList<Role> roles) {
         userService.setRole(id, roles);
-        return new JsonResult(200,"success",null);
+        return new JsonResult(200, "success", null);
     }
 
 

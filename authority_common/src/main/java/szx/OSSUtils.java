@@ -16,14 +16,12 @@ public class OSSUtils  {
     static final String accessKeyId = "LTAI4GGXkoF4SKiRZNLs2TuP";
     static final String accessKeySecret = "gto8a60dAhI9wKyyy5KpSLBao87Iyt";
     static final String bucketName = "cut192623";
-    //static final String objectName = "centos";
 
 
     public void  ossUpload(String fileName,MultipartFile file) throws Exception{
         // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         ossClient.putObject(bucketName,fileName,file.getInputStream());
-
         // 关闭OSSClient。
         ossClient.shutdown();
     }

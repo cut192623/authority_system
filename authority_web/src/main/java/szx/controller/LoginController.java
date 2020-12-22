@@ -45,8 +45,10 @@ public class LoginController {
     }
     @RequestMapping("toIndexPage")
     public String toIndexPage(String name,HttpServletRequest request){
-        User user = userService.getOne(new QueryWrapper<User>().eq("user_name", name));
-        request.setAttribute("user",user);
+        if (name!=null&&name!=""){
+            User user = userService.getOne(new QueryWrapper<User>().eq("user_name", name));
+            request.setAttribute("user",user);
+        }
         return "admin/index";
     }
 

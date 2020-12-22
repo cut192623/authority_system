@@ -26,7 +26,7 @@
 			<ul class="layui-nav layui-layout-right">
 				<li class="layui-nav-item"><a href="javascript:;"> <img
 <%--						todo 修改图片地址--%>
-						src="http://192.168.18.131:80/${user.userImg}" class="layui-nav-img">${user.userName}
+						src="https://cut192623.oss-cn-beijing.aliyuncs.com/${user.userImg}" class="layui-nav-img">${user.userName}
 				</a>
 				</li>
 
